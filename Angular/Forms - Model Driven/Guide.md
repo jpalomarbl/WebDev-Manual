@@ -261,6 +261,80 @@ And if we delete all the text from the inputs, th form is **invalid** and won't 
 
 ![Error messages](image-6.png)
 
+## Form validation
+In this case, we will add some validations for an input and then validate the whole form inside a function once we hit the submit button.
+
+To add the validations we just need to add them to the HTML as we would do if we weren't using angular.
+
+```html
+<input 
+    type="email"
+    name="email"
+    [(ngModel)]="user.email"
+    #email="ngModel"
+    placeholder="Email..."
+    required                                          <!-- validations -->
+    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" <!-- validations -->
+/>
+```
+
+Then, to check different aspects and validations of our input we just need to access the _errors_ object of our input. For example, to show an error message when the pattern isn't correct, we would do the following:
+
+```html
+<span [hidden]="!email.errors?.['pattern'] || email.pristine">
+  Invalid email
+</span>
+```
+
+After this, we want to validate the whole form after we hit the submit button. To do this, in the HTML we need to invoke a submit function and pass the form object as the parameter, and not to disable the button in any case:
+
+```html
+<form #signInForm="ngForm" (ngSubmit)="signIn(signInForm)">
+  ...
+  ...
+
+  <div>
+    <button type="submit">Join Now</button>
+  </div>
+</form>
+```
+
+Then, we do the validation inside our component:
+
+```ts
+export class SignInComponent {
+  user: UserDTO = new UserDTO('', '', '', '', '', '', new Date());
+
+  signIn(form: NgForm): void {
+    console.log(form);
+    if (form.valid) {
+      this.joinNow();
+    } else {
+      console.error('INVALID FORM!');
+    }
+  }
+  
+  joinNow(): void {
+    console.log(
+      'User email --> ' +
+        this.user.email +
+        ', User password --> ' +
+        this.user.password +
+        ', User name -->'+
+        this.user.name +
+        ', User surname1 -->'+
+        this.user.surname1 +
+        ', User surname2 -->'+
+        this.user.surname2 +
+        ', User alias -->'+
+        this.user.alias +
+        ', User birthdate -->'+
+        this.user.birthdate.toISOString().split('T')[0]
+    );
+  }
+}
+```
+
 ## Aditional exercise
 
 Let's assume that instead of doing authentication, we need to do a registration. Therefore, we propose making the following modifications for practice. Specifically, we propose the following steps:
@@ -279,3 +353,5 @@ Let's assume that instead of doing authentication, we need to do a registration.
   - The date must be in the format DD/MM/YYYY.
   - The email must have a valid email format.
 - Display the new information in the console when the `Join Now` button is pressed. Unlike the previous example, where the submit button was enabled when the form was valid, we will make the form validation occur when the button is pressed. That is, the button will always be enabled, and when pressed, the form will be validated. If any field does not meet the validation, the specified red message will be displayed, and if the form is correct, we will launch the `joinNow` function, displaying the different fields in the console. This way, we will have both possible versions of handling the submit button.
+
+NOT
