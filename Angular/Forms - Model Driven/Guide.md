@@ -21,22 +21,22 @@
 
 2. We're gonna make a user authentication form, so we're going to save an email and a password. That's why we'll make a Model. Let's make a _Models_ folder inside of _/app_. And then a _UserDTO_ file inside. A Data Transfer Object is used to identify objects we're going to use to map entities coming from our backend.
 
-![UserDTO](image.png)
+![UserDTO](./img/image.png)
 
 3. Now, we'll make the auth component. For that, we want to create our new component inside _/app_. To do that, we are going to run `ng g c Components/login`.
 
-![Structure](image-1.png)
+![Structure](./img/image-1.png)
 
 4. We are also going to import the new component into _app.component.ts_.
-![Import LoginComponent](image-2.png)
+![Import LoginComponent](./img/image-2.png)
 
 5. Now, let's check that our login component works. To do that, let's go into _app.routes.ts_ and add our new component to the root of our app.
 
-![Route testing](image-3.png)
+![Route testing](./img/image-3.png)
 
 We will see the following "login works!" message when we visit our app in _localhost:4200_:
 
-![login works!](image-4.png)
+![login works!](./img/image-4.png)
 
 ## Controller for LoginComponent
 
@@ -249,7 +249,7 @@ form > div > span {
 
 This would be the result:
 
-![Finished form](image-5.png)
+![Finished form](./img/image-5.png)
 
 4. We can see that it works if we write something in the inputs, hit _login_ and look at the console.
 
@@ -259,7 +259,7 @@ User email --> email, User password --> passwqwrjhsd
 
 And if we delete all the text from the inputs, th form is **invalid** and won't let us login, appart from showng th errors in their dedicated _<span>_.
 
-![Error messages](image-6.png)
+![Error messages](./img/image-6.png)
 
 ## Form validation
 In this case, we will add some validations for an input and then validate the whole form inside a function once we hit the submit button.
@@ -354,4 +354,4 @@ Let's assume that instead of doing authentication, we need to do a registration.
   - The email must have a valid email format.
 - Display the new information in the console when the `Join Now` button is pressed. Unlike the previous example, where the submit button was enabled when the form was valid, we will make the form validation occur when the button is pressed. That is, the button will always be enabled, and when pressed, the form will be validated. If any field does not meet the validation, the specified red message will be displayed, and if the form is correct, we will launch the `joinNow` function, displaying the different fields in the console. This way, we will have both possible versions of handling the submit button.
 
-NOT
+**NOTE: This exercise is resolved inside the _Repo_ folder.**
