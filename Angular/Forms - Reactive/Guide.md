@@ -117,7 +117,7 @@ Finally, we declare the group of form controls (FormGroup) that will controll th
 
 We've also implemented the method that processes the login information (_checkLogin()_).
 
-3. Finally, we just need to bind the form controller to the actual form inside of the HTML:
+3. Now, we just need to bind the form controller to the actual form inside of the HTML:
 
 ```html
 <!-- In login.component.html -->
@@ -138,6 +138,69 @@ We've also implemented the method that processes the login information (_checkLo
         <button type="submit" [disabled]="!loginForm.valid">Login</button>
     </form>
 </div>
+```
+
+4. Finally, we add some styles to the form:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+div.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
+
+    height: 100vh;
+
+    font-family: "Open Sans", sans-serif;
+}
+
+h1 {
+    font-size: 1.8em;
+    text-align: center;
+}
+
+form {
+    width: 25vw;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 2vw;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form > label,
+form > input,
+form > button {
+    width: 50%;
+}
+
+form > label {
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+form > button {
+    background-color:deepskyblue;
+    color: white;
+
+    font-weight: bold;
+
+    border: none;
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    padding: 0.5vh;
+    margin-top: 2vh;
+}
 ```
 
 This way, we have our form done:
@@ -215,6 +278,18 @@ _Validators.required_ just validates that the input has a value inside of it. Th
 
 The error divs only show the error when there are errors in the validation of the input (remember that the only validation by now is that the input needs to be filled) and the input has been edited, so the errors don't show before the user edits the form.
 
+4. Let's add some styles to the feedback messages:
+
+```css
+/* In login.component.css */
+
+form > div > span {
+    color: red;
+    font-size: 0.7em;
+    margin-left: 5px;
+}
+```
+
 The inputs have been filled, so the button is enabled:
 
 ![Filled inputs](image-3.png)
@@ -222,3 +297,49 @@ The inputs have been filled, so the button is enabled:
 The inputs' content has been deleted by the user, so the button is disabled and the errors are showed to the user:
 
 ![Empty inputs](image-4.png)
+
+### Validation and input states
+
+A single input can be in the following states:
+
+- **Valid**: Indicates that the form control has passed all validation checks.
+- **Invalid**: The opposite of valid; it means the form control has failed at least one validation check.
+- **Touched**: This state is true if the user has focused on the form control and then moved away from it.
+- **Untouched**: The opposite of touched; it means the user has not yet focused on the form conntrol.
+- **Pristine**: Indicates that the form control has not been modified by the user.
+- **Dirty**: The opposite of pristine; it means the user has changed the value of the form control.
+
+And every state has its own css class:
+
+```css
+/* field value is valid */
+.ng-valid {}
+
+/* field value is invalid */
+.ng-invalid {}
+
+/* field has not been clicked in, tapped on, or tabbed over */
+.ng-untouched {}
+
+/* field has been previously entered */
+.ng-touched {}
+
+/* field value is unchanged from the default value */
+.ng-pristine {}
+
+/* field value has been modified from the default */
+.ng-dirty {}
+```
+
+Knowing this, we can add different styles depending on the state of the input. For example, let's add a red border to the inputs, but only when they are invalid and have been edited by the user:
+
+```css
+/* In login.component.css */
+
+form > input.ng-invalid.ng-dirty {
+    border-color: red;
+}
+```
+This is what happens to our example when we edit and then delete our inputs:
+
+![Error borders](image-5.png)

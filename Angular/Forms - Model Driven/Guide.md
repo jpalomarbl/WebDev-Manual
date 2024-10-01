@@ -165,11 +165,11 @@ import { FormsModule } from '@angular/forms';     // We add this import
 The directive _ngForm_ allows us to check all the different states of the form and all its inputs, these being:
 
 - **Valid**: Indicates that the form control has passed all validation checks.
-- **Invalid**: The opposite of valid; it means the form control has failed at least one -lidation check.
-- **Touched**: This state is true if the user has focused on the form control and then moved -ay (blurred) from it.
-- **Untouched**: The opposite of touched; it means the user has not yet focused on the form -ntrol.
+- **Invalid**: The opposite of valid; it means the form control has failed at least one validation check.
+- **Touched**: This state is true if the user has focused on the form control and then moved away from it.
+- **Untouched**: The opposite of touched; it means the user has not yet focused on the form conntrol.
 - **Pristine**: Indicates that the form control has not been modified by the user.
-- **Dirty**: The opposite of pristine; it means the user has changed the value of the form control⁴.
+- **Dirty**: The opposite of pristine; it means the user has changed the value of the form control.
 
 These states help in tracking and responding to user interactions with the form, as shown in the _<span>_ validators (`[hidden]="email.valid || email.pristine`).
 
