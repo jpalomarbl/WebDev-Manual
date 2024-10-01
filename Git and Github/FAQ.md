@@ -43,3 +43,7 @@ Repo-A
       |
       --- Still_not_much.md
 ```
+
+### How can I update a submodule so it points to the last commit of its repository?
+
+First, we move to the submodule's folder inside of our parent repo. Then we run `git fetch` and `git pull`. Then, we go back to the parent repo to stage and commit our changes. It's that easy.
