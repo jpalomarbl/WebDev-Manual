@@ -57,3 +57,62 @@ export const routes: Routes = [
 We will see the following "login works!" message when we visit our app in _localhost:4200_:
 
 ![login works!](./image-1.png)
+
+## Login Component implementation
+
+1. So, first we need to import _FormBuilder, FormControll, FormGroup_ to our new component to build the form, and _UserDTO_ to save the information of the user.
+
+```ts
+// In login.component.ts
+
+import { Component } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { UserDTO } from '../../Models/user.dto';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [ReactiveFormsModule],       // IMPORTANT
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css'
+})
+```
+
+It's very important to import and include in the imports the _ReactiveFormsModule_ to be able to use reactive forms functionalities in our HTML later on.
+
+2. Then, we declare and initialize the atributes of our component:
+
+```ts
+export class LoginComponent {
+  user: UserDTO = new UserDTO('','');
+
+  email: FormControl = new FormControl(this.user.email);
+  password: FormControl = new FormControl(this.user.password);
+  loginForm: FormGroup = new FormGroup({});
+
+  constructor(private fb: FormBuilder) {
+    this.loginForm = this.fb.group({
+      email: this.email,
+      password: this.password
+    });
+  }
+
+  checkLogin(): void {
+    this.user.email = this.email.value;
+    this.user.password = this.password.value;
+
+    console.log(
+      'User: ',
+      this.user.email,
+      '\nPassword: ',
+      this.user.password
+    );
+  }
+}
+```
+
+First, we declare the _user_ attribute, which will hold the user information (email and password). Then we declare the two form inputs as FormControls to be able to access and validate both of them independently.
+
+Finally, we declare the group of form controls (FormGroup) that will controll the whole form.Later, we need to initialize it using a form builder to create the form controller.
+
+We've also implemented the method that processes the login information (_checkLogin()_).
