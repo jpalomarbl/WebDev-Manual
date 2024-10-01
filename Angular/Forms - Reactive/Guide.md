@@ -116,3 +116,109 @@ First, we declare the _user_ attribute, which will hold the user information (em
 Finally, we declare the group of form controls (FormGroup) that will controll the whole form.Later, we need to initialize it using a form builder to create the form controller.
 
 We've also implemented the method that processes the login information (_checkLogin()_).
+
+3. Finally, we just need to bind the form controller to the actual form inside of the HTML:
+
+```html
+<!-- In login.component.html -->
+
+<div class="container">
+    <h1>Test Reactive Forms App</h1>
+    <form [formGroup]="loginForm" (ngSubmit)="checkLogin()">
+        <label for="email">
+            Email: 
+        </label>
+        <input type="email" [formControl]="email">
+    
+        <label for="password">
+            Password: 
+        </label>
+        <input type="password" [formControl]="password">
+        
+        <button type="submit" [disabled]="!loginForm.valid">Login</button>
+    </form>
+</div>
+```
+
+This way, we have our form done:
+
+![Form](image-2.png)
+
+## Validation
+
+1. To be able to validate our inputs we need to import the _Validators_ module into our component:
+
+```ts
+import { Component } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators } from '@angular/forms';             // This line
+import { UserDTO } from '../../Models/user.dto';
+import { CommonModule } from '@angular/common';   // And this line
+```
+
+We also imported the _CommonModule_ to be able to use _ngIf_ and other Angular tools in our HTML file.
+
+2. Then, we just have to add the validators to the _FormControls_ as follows:
+
+```ts
+// In login.component.ts
+
+export class LoginComponent {
+  user: UserDTO = new UserDTO('','');
+
+  email: FormControl = new FormControl(this.user.email, Validators.required);   // Here
+  password: FormControl = new FormControl(this.user.password, Validators.required);   // And here
+  loginForm: FormGroup = new FormGroup({});
+
+  // Other things
+}
+```
+
+_Validators.required_ just validates that the input has a value inside of it. There are a ton more that come prebuilt in Angular. For example, _Validators.minLength(N)_ checks that the length of the input is, at least, of N characters.
+
+3. Now, we need to add some feedback so the user knows when and why the validation fails.
+
+```html
+<!-- In login.component.html -->
+
+<div class="container">
+    <h1>Test Reactive Forms App</h1>
+    <form [formGroup]="loginForm" (ngSubmit)="checkLogin()">
+        <label for="email">
+            Email: 
+        </label>
+        <input type="email" [formControl]="email">
+        <div class="errors" *ngIf="email.errors && email.dirty">
+            <span>
+                Email is required
+            </span>
+        </div>    <!-- This div -->
+
+        <label for="password">
+            Password: 
+        </label>
+        <input type="password" [formControl]="password">
+        <div class="errors" *ngIf="password.errors && password.dirty">
+            <span>
+                Password is required
+            </span>
+        </div>    <!-- And this div -->
+
+        <button type="submit" [disabled]="!loginForm.valid">Login</button>
+    </form>
+</div>
+```
+
+The error divs only show the error when there are errors in the validation of the input (remember that the only validation by now is that the input needs to be filled) and the input has been edited, so the errors don't show before the user edits the form.
+
+The inputs have been filled, so the button is enabled:
+
+![Filled inputs](image-3.png)
+
+The inputs' content has been deleted by the user, so the button is disabled and the errors are showed to the user:
+
+![Empty inputs](image-4.png)
