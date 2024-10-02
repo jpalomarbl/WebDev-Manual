@@ -1,3 +1,6 @@
 [submodule "Angular/Forms - Model Driven/Repo"]
 	path = Angular/Forms - Model Driven/Repo
 	url = https://github.com/jpalomarbl/modelDrivenForms_Angular
+[submodule "Angular/Forms - Reactive/Repo"]
+	path = Angular/Forms - Reactive/Repo
+	url = https://github.com/jpalomarbl/reactiveForms_Angular
