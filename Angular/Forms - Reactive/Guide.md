@@ -422,3 +422,24 @@ export class LoginComponent {
 This way, if we write "email@email.com" in our email input, we get the following result:
 
 ![Custom validator error message](image-7.png)
+
+## Aditional exercise
+
+Let's assume that instead of doing authentication, we need to do a registration. Therefore, we propose making the following modifications for practice. Specifically, we propose the following steps:
+
+- Create a new component `sign-in`.
+- Create a new route `/sign-in` that points to the component created in the previous step.
+- Extend the `UserDTO` model with the following fields:
+  - `name`: text.
+  - `surname1`: text.
+  - `surname2`: text.
+  - `alias`: text.
+  - `birthDate`: date.
+- Create the registration form in the `sign-in` component. The validations that must be met are as follows:
+  - `Email`, `password`, `name`, `surname1`, `alias`, and `birthDate` are required fields.
+  - The fields `name`, `surname1`, `surname2`, and `alias` must be between 5 and 25 characters.
+  - The date must be in the format DD/MM/YYYY.
+  - The email must have a valid email format and cannot be "fakeEmail@email.net".
+- Display the new information in the console when the `Join Now` button is pressed. Unlike the previous example, where the submit button was enabled when the form was valid, we will make the form validation occur when the button is pressed. That is, the button will always be enabled, and when pressed, the form will be validated. If any field does not meet the validation, the specified red message will be displayed, and if the form is correct, we will launch the `joinNow` function, displaying the different fields in the console. This way, we will have both possible versions of handling the submit button.
+
+**NOTE: This exercise is resolved inside the _Repo_ folder.**
