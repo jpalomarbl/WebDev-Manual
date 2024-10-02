@@ -343,3 +343,82 @@ form > input.ng-invalid.ng-dirty {
 This is what happens to our example when we edit and then delete our inputs:
 
 ![Error borders](image-5.png)
+
+### Custom validators
+
+Let's make a custom validator that checks if the input's email is different from "email@email.com".
+
+1. First, we need to create a _Directives_ folder inside of _/app_, and the proper file to store our custom validator.
+
+![File structure](image-6.png)
+
+2. Then, we will create our validator. Validators allways need to return a _ValidatorFn_ function, which will either return a _ValidationErrors_ object when the input is invalid, or null when it's valid.
+
+```ts
+import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
+
+export function checkInvalidKeyWord(nameRe: RegExp): ValidatorFn {
+    // Validation functions must return a ValidatorFn object
+    return(control: AbstractControl): ValidationErrors | null => {
+        const forbidden = nameRe.test(control.value);
+
+        // If the input and the regex match, the input will be invalid
+        // and the function will return the ValidationErrors object invalidKeyWord.
+        // And if they don't, the input is valid, so the function returns null. 
+
+        return forbidden ? {invalidKeyWord: {value: control.value}} : null;
+    };
+}
+```
+
+3. Now, we need to import and use the new custom validator for the email input form the past example.
+
+```ts
+// In login.component.ts
+
+// ...
+import { UserDTO } from '../../Models/user.dto';
+import { checkInvalidKeyWord } from '../../Directives/check-invalid-keyword.validator';     // Import the custom validator
+
+// ...
+
+export class LoginComponent {
+  user: UserDTO = new UserDTO('','');
+
+  email: FormControl = new FormControl(this.user.email, [
+    Validators.required,
+    checkInvalidKeyWord(/email@email.com/)      // Use the validator for the email input, passing the unwanted email as regex argument.
+  ]);
+  password: FormControl = new FormControl(this.user.password, [
+    Validators.required,
+    Validators.minLength(8)
+  ]);
+
+  // ...
+}
+```
+
+4. Now we just need to implement feedback for the user in the HTML:
+
+```html
+<label for="email">
+    Email: 
+</label>
+
+<input type="email" [formControl]="email">
+
+<div class="errors" *ngIf="email.errors && email.dirty">
+    <span *ngIf="email.errors?.['required']">
+        Email is required
+    </span>
+
+    <!-- New error span message -->
+    <span *ngIf="email.errors?.['invalidKeyWord']">
+        email&#64;email.com is not a valid email.
+    </span>
+</div>
+```
+
+This way, if we write "email@email.com" in our email input, we get the following result:
+
+![Custom validator error message](image-7.png)
