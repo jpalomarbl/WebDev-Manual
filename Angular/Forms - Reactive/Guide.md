@@ -39,7 +39,7 @@ export class UserDTO {
 ```
 4. Now, we'll make the auth component. For that, we want to create our new component inside _/app_. To do that, we are going to run `ng g c Components/login`.
 
-![Structure](image.png)
+![Structure](./img/image.png)
 5. Now, let's check that our login component works. To do that, let's go into _app.routes.ts_ and add our new component to the root of our app.
 
 ```ts
@@ -56,7 +56,7 @@ export const routes: Routes = [
 
 We will see the following "login works!" message when we visit our app in _localhost:4200_:
 
-![login works!](./image-1.png)
+![login works!](./img/image-1.png)
 
 ## Login Component implementation
 
@@ -205,7 +205,7 @@ form > button {
 
 This way, we have our form done:
 
-![Form](image-2.png)
+![Form](./img/image-2.png)
 
 ## Validation
 
@@ -292,11 +292,11 @@ form > div > span {
 
 The inputs have been filled, so the button is enabled:
 
-![Filled inputs](image-3.png)
+![Filled inputs](./img/image-3.png)
 
 The inputs' content has been deleted by the user, so the button is disabled and the errors are showed to the user:
 
-![Empty inputs](image-4.png)
+![Empty inputs](./img/image-4.png)
 
 ### Validation and input states
 
@@ -342,7 +342,7 @@ form > input.ng-invalid.ng-dirty {
 ```
 This is what happens to our example when we edit and then delete our inputs:
 
-![Error borders](image-5.png)
+![Error borders](./img/image-5.png)
 
 ### Custom validators
 
@@ -350,7 +350,7 @@ Let's make a custom validator that checks if the input's email is different from
 
 1. First, we need to create a _Directives_ folder inside of _/app_, and the proper file to store our custom validator.
 
-![File structure](image-6.png)
+![File structure](./img/image-6.png)
 
 2. Then, we will create our validator. Validators allways need to return a _ValidatorFn_ function, which will either return a _ValidationErrors_ object when the input is invalid, or null when it's valid.
 
@@ -421,7 +421,7 @@ export class LoginComponent {
 
 This way, if we write "email@email.com" in our email input, we get the following result:
 
-![Custom validator error message](image-7.png)
+![Custom validator error message](./img/image-7.png)
 
 ## Aditional exercise
 
