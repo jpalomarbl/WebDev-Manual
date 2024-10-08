@@ -335,3 +335,199 @@ Notice that the buttons make a call to their respective methods when you click o
 After adding some styles and posting some messages into the database using Postman, we should get something like this.
 
 ![Result](image.png)
+
+## MessageForm component
+
+This component will be the one in charge of updating and creating messages.
+
+To do this, we are going to need a variable to store the message to create/update, a boolean that we will use to determine if we are updating or creating a message, and a form (in this case a Reactive Form). You can see a [guide on Reactive Forms](../Forms%20-%20Reactive/) in this same WebDev Manual.
+
+1. But, first, the imports:
+
+```ts
+// In message-form.component.ts
+
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MessageDTO } from '../../Models/message.dto';
+import { MessageService } from '../../Services/message.service';
+```
+
+2. Then, we create all the attributes we need:
+
+```ts
+// In message-form.component.ts
+
+export class MessageFormComponent {
+  message: MessageDTO = new MessageDTO('', '');
+  
+  title: FormControl = new FormControl(this.message.title, Validators.required);
+  description: FormControl = new FormControl(this.message.description, Validators.required);
+  messageForm:FormGroup = new FormGroup({});
+
+  updateFlag: boolean = false;
+}
+```
+
+3. Now, if we remember the _messageList_ component we made earlier, we made two possible links to get to the _messageForm_ component:
+    - "/messages/create" if we are going to create a new message.
+    - "messages/[any ID] if we are going to update an existing message.
+
+This means that, if the last parameter of the URL is a number, we need to set the _updateFlag_ to true, so that the component knows that we are updating and not creating a message.
+
+```ts
+constructor(private route: ActivatedRoute, private router: Router, private messageService: MessageService, private fb: FormBuilder) {
+    let urlLastParam = '';
+    
+    this.route.url.subscribe(url => {
+      urlLastParam = url[1].path;
+    });
+
+    this.messageForm = this.fb.group({
+      title: this.title,
+      description: this.description
+    });
+
+    if (+urlLastParam) {
+      this.updateFlag = true;
+
+      this.message.id = +urlLastParam;
+
+      this.prepareUpdateForm();
+    }
+}
+
+private async prepareUpdateForm(): Promise<void> {
+    try {
+      this.messageService.getMessageById(this.message.id)
+      .then((message: MessageDTO) => {
+        this.title.setValue(message.title);
+        this.description.setValue(message.description);
+      })
+    } catch(error: any) {
+      this.messageService.errorLog(error);
+    }
+}
+```
+
+The idea is that, if we are updating an existin message, we want to insert the existing title and description into the inputs of the form so that the user can edit them. So, knowing the ID (because we get it from the URL), we just need to call the _getMessageById()_ method we implemented in _MessageService_.
+
+4. Now, the idea is that, when the user hits the _Submit_ button, the _checkSendForm()_ method will check th validity of the form (so that the user can't sent empty values) and will try to send the information to the API. If the form isn't valid or the API fails to recieve the information, the user will be shown a toast with an error message; and if everything works, a success message will appear, and we will redirect the user to the main page.
+
+```ts
+checkSendForm(): void {
+    const formStatus: boolean = this.messageForm.valid;
+    let sendStatus: boolean = false;
+
+    if (!formStatus) {
+      this.toastRedirect(formStatus);
+    } else {
+      this.sendForm()
+      .then((result: boolean) => {
+        sendStatus = result;
+      
+        this.toastRedirect(formStatus && sendStatus);
+      });
+    }
+}
+
+private async toastRedirect(status: boolean): Promise<void> {
+    const messageToast = document.getElementById('message-toast');
+    const messageToastText = document.querySelector<HTMLElement>('div#message-toast > span');
+
+    messageToast?.classList.remove('no-display');
+
+    if (status) {
+      messageToast!.className = 'success';
+
+      if (this.updateFlag) {
+        messageToastText!.innerText = 'Congratulations, message updated!';
+      } else {
+        messageToastText!.innerText = 'Congratulations, message created!';
+      }
+
+      await this.messageService.wait(1500);
+      this.router.navigateByUrl('');
+    } else {
+      messageToast!.className = 'failiure';
+
+      if (this.updateFlag) {
+        messageToastText!.innerText = 'Unable to update message.';
+      } else {
+        messageToastText!.innerText = 'Unable to create message.';
+      }
+    }
+}
+
+private async sendForm(): Promise<boolean> {
+    this.message.title = this.title.value;
+    this.message.description = this.description.value;
+    
+    try {
+      if (this.updateFlag) {
+        await this.messageService.updateMessage(this.message.id, this.message)
+        return true;
+      } else {
+        await this.messageService.createMessage(this.message)
+        return true;
+      }
+    } catch(error: any) {
+      this.messageService.errorLog(error);
+      return false;
+    }
+}
+```
+
+### HTML for MessageForm
+
+Now, let's make the structure for our component, which will be a pretty simple Reactive Form. If there's anythig you don't understand about Reactive Forms, please, [read the guide](../Forms%20-%20Reactive/) in this same WebDev Manual.
+
+```html
+<!-- In message-form.component.html -->
+
+<div class="main-container">
+    <h1 *ngIf="updateFlag">Update Form</h1>
+    <h1 *ngIf="!updateFlag">Creation Form</h1>
+
+    <form [formGroup]="messageForm" (ngSubmit)="checkSendForm()">
+        <div class="title">
+            <label for="title">
+                Title:
+            </label>
+            <input type="text" name="title" [formControl]="title" />
+            <span class="error" *ngIf="title.errors && title.touched">
+                Title is required
+            </span>
+        </div>
+
+        <div class="description">
+            <label for="description">
+                Description:
+            </label>
+            <input type="text" name="description" [formControl]="description" />
+            <span class="error" *ngIf="description.errors && description.touched">
+                Description is required
+            </span>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="message-toast" class="no-display">
+        <span></span>
+    </div>
+</div>
+```
+
+After adding some styles, the result should look similar to this:
+
+![Result form Success](image-1.png)
+![Result form Failiure](image-2.png)
