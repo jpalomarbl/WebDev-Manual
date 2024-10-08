@@ -334,7 +334,7 @@ Notice that the buttons make a call to their respective methods when you click o
 
 After adding some styles and posting some messages into the database using Postman, we should get something like this.
 
-![Result](image.png)
+![Result](./img/image.png)
 
 ## MessageForm component
 
@@ -529,5 +529,5 @@ Now, let's make the structure for our component, which will be a pretty simple R
 
 After adding some styles, the result should look similar to this:
 
-![Result form Success](image-1.png)
-![Result form Failiure](image-2.png)
+![Result form Success](./img/image-1.png)
+![Result form Failiure](./img/image-2.png)
