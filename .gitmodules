@@ -4,3 +4,6 @@
 [submodule "Angular/Forms - Reactive/Repo"]
 	path = Angular/Forms - Reactive/Repo
 	url = https://github.com/jpalomarbl/reactiveForms_Angular
+[submodule "Angular/Consuming an API/Repo"]
+	path = Angular/Consuming an API/Repo
+	url = https://github.com/jpalomarbl/blog-angular
