@@ -7,3 +7,6 @@
 [submodule "Angular/Consuming an API/Repo"]
 	path = Angular/Consuming an API/Repo
 	url = https://github.com/jpalomarbl/blog-angular
+[submodule "Angular/Internationalization - i18n/ngx-translate/Repo"]
+	path = Angular/Internationalization - i18n/ngx-translate/Repo
+	url = https://github.com/jpalomarbl/Desarrollo-frontend-avanzado-PEC
