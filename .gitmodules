@@ -10,3 +10,6 @@
 [submodule "Angular/Internationalization - i18n/ngx-translate/Repo"]
 	path = Angular/Internationalization - i18n/ngx-translate/Repo
 	url = https://github.com/jpalomarbl/Desarrollo-frontend-avanzado-PEC
+[submodule "Development methodologies/BEM/Repo"]
+	path = Development methodologies/BEM/Repo
+	url = https://github.com/jpalomarbl/herramientasHTMLyCSS2-PEC1
