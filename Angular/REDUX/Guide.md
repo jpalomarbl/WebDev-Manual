@@ -30,7 +30,6 @@ import { createAction, props } from "@ngrx/store";
 export const increment = createAction('[Counter Component] Increment');
 export const decrement = createAction('[Counter Component] Decrement');
 export const duplication = createAction('[Counter Component] Duplication');
-export const resetAction = createAction('[Counter Component] ResetAction');
 ```
 
 2. Now we need to create the reducer, so we make a `app/Counter/counter.reducer.ts` file. Inside of it, we will have a function that's basically a switch case conditional selector that takes the current state of te **store** and an action as arguments.
@@ -50,8 +49,7 @@ const _counterReducer = createReducer(
   initialState,
   on(actions.increment, (state) => state + 1),  // Increment adds 1
   on(actions.decrement, (state) => state - 1),  // Decremend substracts 1
-  on(actions.duplication, (state) => state * 2),  // Duplicate duplicates
-  on(actions.resetAction, () => initialState)   // Reset sets the counter value to be the initial value
+  on(actions.duplication, (state) => state * 2)  // Duplicate duplicates
 );
 
 // We export a function that takes the state and an action
@@ -257,3 +255,37 @@ Now, it should look like this:
 ![Daughter component](img/image-2.png)
 
 And that's it. We have an app with several components that all modify the same data, but don't need to comunicate between each other, because everything is stored in the **store**.
+
+## Props
+We can add props to actions, that act like arguments of a function. For example, let's add a prop to our *duplicate* action so we have to pass a **2** as a prop when we call it.
+
+1. First let's modify our action.
+```ts
+// In counter.actions.ts
+
+// export const duplication = createAction('[Counter Component] Duplication');
+export const duplication = createAction('[Counter Component] Duplication', props<{ number: number }>());
+```
+
+**VERY IMPORTANT**: *props* is a funtion, so you need to add the parenthesis at the end.
+
+2. Now, we need to change the reducer so it multiplies the state by *number*
+
+```ts
+// In counter.reducer.ts
+const _counterReducer = createReducer(
+  initialState,
+  on(actions.increment, (state) => state + 1),
+  on(actions.decrement, (state) => state - 1),
+  on(actions.duplication, (state, { number }) => state * number) // Here
+);
+```
+
+3. Finally, we just need to call it properly in our daughter component:
+
+```ts
+// In daughter.component.ts
+duplicate(): void {
+  this.store.dispatch(actions.duplication({ number: 2 }));
+}
+```
