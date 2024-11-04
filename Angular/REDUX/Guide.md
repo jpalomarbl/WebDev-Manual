@@ -58,6 +58,26 @@ export function counterReducer(state: number | undefined, action: Action) {
 }
 ```
 
+This is the same as doing the following:
+
+```ts
+export function counterReducer(state: number = 20, action: Action) {
+  switch (action.type) {
+    case increment.type:
+      return state + 1;
+
+    case decrement.type:
+      return state - 1;
+
+    case duplication.type:
+      return state * 2;
+
+    default:
+      return state;
+  }
+}
+```
+
 3. Next, we need to add the reducer to the store.
 
 ```ts
