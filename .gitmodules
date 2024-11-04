@@ -16,3 +16,6 @@
 [submodule "Angular/Observables (rxjs)/Repo"]
 	path = Angular/Observables (rxjs)/Repo
 	url = https://github.com/jpalomarbl/Desarrollo-frontend-avanzado-PEC
+[submodule "Angular/REDUX/Repo"]
+	path = Angular/REDUX/Repo
+	url = https://github.com/jpalomarbl/counter-app-redux.git
