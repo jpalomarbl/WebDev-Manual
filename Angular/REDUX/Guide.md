@@ -310,6 +310,48 @@ duplicate(): void {
 }
 ```
 
+## Redux Dev Tools
+This is a browser extension we can use to check all the info about the store, states, actions, etc...
+
+1. To use it, first we need to install it in our project by running `npm i @ngrx/store-devtools --save`.
+
+2. We are going to need environmental variables for the configuration. Before Angular 15 the propper files were generated automatically, but for recent versions we need to run `ng generate environments`. This will create an *environments* folder that holds files for environmental variables for development and production. We will only use the `environments.ts` file by now for simplicity. We have to add a new variable:
+
+```ts
+// In environments/environment.ts
+export const environment = {
+  production: true
+};
+```
+
+3. Now, we have to configure it as a provider. It's cery similar as how we configured the store for REDUX as a provider inside of `app.config.ts`.
+
+```ts
+// In app.config.ts
+
+// Other important imports
+// ...
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // Other important providers
+    // ...
+    provideStoreDevtools({  // We add this default configuration
+      maxAge: 25,
+      logOnly: environment.production // Enable log-only mode in production
+    })
+  ]
+};
+```
+
+4. Next, we need to install the browser extension for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/reduxdevtools/) or [Chrome](https://chromewebstore.google.com/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en&pli=1).
+
+5. Finally, if we run `ng serve` and go to `localhost:4200` we can use our extension:
+
+![Redux Dev Tools extension](./img/image-3.png)
+
 ## Frequent errors
 
 * When trying to configure the store in `app.config.ts`, we might get the following error:
