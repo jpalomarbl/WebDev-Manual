@@ -309,3 +309,47 @@ duplicate(): void {
   this.store.dispatch(actions.duplication({ number: 2 }));
 }
 ```
+
+## Frequent errors
+
+* When trying to configure the store in `app.config.ts`, we might get the following error:
+```ts
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideStore({ counter: counterReducer })  // The line producing the error
+  ]
+};
+
+// ERROR:
+// Type '(state: number, action: Action<string>) => TodoDTO[]' is not assignable to type 'ActionReducer<number, Action<string>>'.
+//   Types of parameters 'state' and 'state' are incompatible.
+//     Type 'number | undefined' is not assignable to type 'number'.
+//       Type 'undefined' is not assignable to type 'number'.
+```
+
+In this case, we see that the error happens when we try to assign `undiefined` to `number` (or the type we choose for our states) or viceversa. This is fixed by asigning a default value to the state parameter of our reducer, so it never is `undefined`.
+
+```ts
+// In counter.reducer.ts
+export const initialState = 20;
+
+const _counterReducer = createReducer(
+  initialState,
+  on(actions.increment, (state) => state + 1),
+  on(actions.decrement, (state) => state - 1),
+  on(actions.duplication, (state, { number }) => state * number),
+  on(actions.resetAction, () => initialState)
+);
+
+// Before
+export function counterReducer(state: number | undefined, action: Action) {
+  return _counterReducer(state, action);
+}
+
+// After
+export function counterReducer(state: number = initialState, action: Action) {
+  return _counterReducer(state, action);
+}
+```
