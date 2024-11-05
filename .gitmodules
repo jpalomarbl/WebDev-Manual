@@ -19,3 +19,6 @@
 [submodule "Angular/REDUX/Repo"]
 	path = Angular/REDUX/Repo
 	url = https://github.com/jpalomarbl/counter-app-redux.git
+[submodule "Angular/REDUX/Example TODO app"]
+	path = Angular/REDUX/Example TODO app
+	url = https://github.com/jpalomarbl/todo-app-redux
