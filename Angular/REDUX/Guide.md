@@ -98,6 +98,36 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
+**NOTE**: In previous versions of Angular, we would do it this way:
+
+```ts
+// In app.module.ts
+
+// Other imports
+// ...
+import { StoreModule } from '@ngrx/store';
+import { counterReducer } from './counter.reducer.ts';
+
+@NgModule({
+  declarations: [
+    // A lot of declarations
+    // ...
+  ],
+  imports: [
+    // A lot of imports
+    // ...
+    StoreModule.forRoot({counter: counterReducer})
+  ],
+  providers: [
+    {
+      // Some providers
+    },
+  ],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
+
 5. Next, for simplicity, we need to create an interface that represents a state of the store. In this case it will be easy, as the store only holds one attribute: counter. We need to create a `app/app.reducer.ts` file.
 
 ```ts
@@ -310,6 +340,160 @@ duplicate(): void {
 }
 ```
 
+## Effects
+The most common way of having information in your app is to request it from a back end. To do that in REDUX we use effects.
+
+![Effects graph](./img/image-4.png)
+
+We usually also have a service that makes all the HTTP requests.
+
+The philosophy behind effects is that they would trigger and do their thing every time a certain action runs.
+
+But first of all, we need to install the effects module: `npm install @ngrx/effects`.
+
+For this example, we made a few new actions:
+
+```ts
+// In actions/todo.actions.ts
+
+export const getAll = createAction('[TODOS] Get all TODOS');
+
+export const getAllSuccess = createAction(
+  '[TODOS] TODOS retrieved SUCCESSFULLY',
+  props<{ todos: TodoDTO[] }>()
+);
+
+export const getAllError = createAction(
+  '[TODOS] TODOS retrieved UNSUCCESSFULLY',
+  props<{ payload: any }>()
+);
+```
+
+And this is what they do in the reducer:
+
+```ts
+// In reducers/todo.reducer.ts
+on(actions.getAll, (state) => ({ ...state, loading: true })),
+on(actions.getAllSuccess, (state, { todos }) => {
+  return {
+  ...state,
+  loading: false,
+  loaded: true,
+  todos: [...todos],
+  };
+}),
+on(actions.getAllError, (state, { payload }) => ({
+  ...state,
+  loading: false,
+  loaded: false,
+  error: payload,
+}))
+```
+
+We also updated our `AppState` interface:
+
+```ts
+// In reducers/todo.reducer.ts
+
+export interface TodoState {
+  todos: TodoDTO[];
+  loading: boolean;
+  loaded: boolean;
+  error: any;
+}
+```
+
+As we're retrieveing information from a database, this could take some time. Therefor we need to state when we're loading the information, and when the informations is already loaded. That's why the `getAll` action only "activates" the loading state. Then, once the datd retrieving operation finishes (either succesfully or on an error), the loading state "deactivates" and the state updates. To stage the course of action is the function of the `TodoEffect.getTodo$` we made.
+
+```ts
+// In effects/todo.effects.ts
+
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { catchError, map, mergeMap, of } from 'rxjs';
+import { take } from 'rxjs';
+
+import * as actions from '../actions';
+import { TodoService } from '../services/todo.service';
+
+@Injectable()
+export class TodosEffects {
+  constructor(private actions$: Actions, private todoService: TodoService) {}
+
+  getTodos$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.getAll),
+      take(1),
+      mergeMap(() =>
+        this.todoService.getAllTodos().pipe(
+          map((todos) => {
+            return actions.getAllSuccess({ todos: todos })
+          }),
+          catchError((err) => of(actions.getAllError({ payload: err })))
+        )
+      )
+    )
+  );
+}
+```
+
+**Note**: We end the `getTodos$` method with *$* because it's the standard.
+
+Line by line, the method `getTodos$` listens ONLY to the `getAll` action. Then, let's the following block run only once (because sometimes it can happen that the block runs many times at once). Then, we merge the outputs of the Observable returned by the `todoService.getAllTodos()`, which is the one making the HTTP request. For every output, we map it to run the `getAllSuccess` action no success, but if it fails, it runs the `getAllError` action.
+
+Next, we need to configure the effects like we did for the store inside of `app.config.ts` (or `app.module.ts` in older versions of Angular):
+
+```ts
+// In app.config.ts
+
+// Other imports
+// ...
+import { provideStore } from '@ngrx/store';
+import { todoReducer } from './reducer/todo.reducer';
+import { provideEffects } from '@ngrx/effects';
+import { TodoEffects } from './effects/todo.effects';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideClientHydration(),
+    provideStore({ todos: todoReducer }),
+    provideEffects([AuthEffects])   // Here
+  ]
+};
+
+// In app-module.ts for older versions of Angular
+// Other imports
+// ...
+import { StoreModule } from '@ngrx/store';
+import { TodoReducer } from './reducer/todo.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { TodoEffects } from './effects/todo.effects';
+
+@NgModule({
+  declarations: [
+    // A lot of declarations
+    // ...
+  ],
+  imports: [
+    // A lot of imports
+    // ...
+    StoreModule.forRoot({counter: counterReducer}),
+    EffectsModule.forRoot([TodoEffects])    // Here
+  ],
+  providers: [
+    {
+      // Some providers
+    },
+  ],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+
+```
+
+Now, we would just need to run `this.store.dispatch(actions.getAll());` to run the `getAll` action, so it triggers the effect.
+
 ## Redux Dev Tools
 This is a browser extension we can use to check all the info about the store, states, actions, etc...
 
@@ -324,7 +508,7 @@ export const environment = {
 };
 ```
 
-3. Now, we have to configure it as a provider. It's cery similar as how we configured the store for REDUX as a provider inside of `app.config.ts`.
+3. Now, we have to configure it as a provider. It's very similar as how we configured the store for REDUX as a provider inside of `app.config.ts`.
 
 ```ts
 // In app.config.ts
@@ -395,3 +579,169 @@ export function counterReducer(state: number = initialState, action: Action) {
   return _counterReducer(state, action);
 }
 ```
+
+* How can I run a block of code AFTER an action has been completed?
+[Source](https://stackoverflow.com/questions/42547715/executing-code-after-dispatch-is-completed-while-using-ngrx)
+
+If we remember our effects example, we had three actions:
+
+```ts
+// In actions/todo.actions.ts
+
+export const getAll = createAction('[TODOS] Get all TODOS');
+
+export const getAllSuccess = createAction(
+  '[TODOS] TODOS retrieved SUCCESSFULLY',
+  props<{ todos: TodoDTO[] }>()
+);
+
+export const getAllError = createAction(
+  '[TODOS] TODOS retrieved UNSUCCESSFULLY',
+  props<{ payload: any }>()
+);
+```
+
+And this is what they do in the reducer:
+
+```ts
+// In reducers/todo.reducer.ts
+on(actions.getAll, (state) => ({ ...state, loading: true })),
+on(actions.getAllSuccess, (state, { todos }) => {
+  return {
+  ...state,
+  loading: false,
+  loaded: true,
+  todos: [...todos],
+  };
+}),
+on(actions.getAllError, (state, { payload }) => ({
+  ...state,
+  loading: false,
+  loaded: false,
+  error: payload,
+}))
+```
+
+The idea is that the main action (`getAll`) would trigger an effect that, on success would run `getAllSuccess` and on error would run `getAllError`.
+
+```ts
+// In effects/todo.effects.ts
+
+// Some imports
+
+@Injectable()
+export class TodosEffects {
+  constructor(private actions$: Actions, private todoService: TodoService) {}
+
+  getTodos$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.getAll),
+      take(1),
+      mergeMap(() =>
+        this.todoService.getAllTodos().pipe(
+          map((todos) => {
+            return actions.getAllSuccess({ todos: todos })
+          }),
+          catchError((err) => of(actions.getAllError({ payload: err })))
+        )
+      )
+    )
+  );
+}
+```
+
+Now, let's say that we wanted to run a block of code AFTER the `getAll` action has been completed succesfully, another one after it fails, and another one without taking into account whether it fails or succeeds.
+
+First we need to make a new action. Let's call it `afterGetAll`.
+
+```ts
+// In actions/todo.actions.ts
+
+export const afterGetAll = createAction('[TODOS] Get all TODOS: Completed');
+```
+
+Now, let's add our new effects.
+
+```ts
+// In effects/todo.effects.ts
+
+// Some imports
+
+@Injectable()
+export class TodosEffects {
+  constructor(private actions$: Actions, private todoService: TodoService) {}
+
+  getTodos$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.getAll),
+      take(1),
+      mergeMap(() =>
+        this.todoService.getAllTodos().pipe(
+          map((todos) => {
+            return actions.getAllSuccess({ todos: todos })
+          }),
+          catchError((err) => of(actions.getAllError({ payload: err })))
+        )
+      )
+    )
+  );
+
+  // This runs AFTER the getAll action succeeds
+  afterGetTodosSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.getAllSuccess),
+      take(1),
+      map(() => {
+        // Your success code here
+
+        return actions.afterGetAll();
+      })
+    )
+  );
+
+  // This runs AFTER the getAll action fails
+  afterGetTodosError$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.getAllSuccess),
+      take(1),
+      map(() => {
+        // Your error code here
+
+        return actions.afterGetAll();
+      })
+    )
+  );
+
+  // This runs AFTER the getAll action, whether it fails or succeeds
+  afterGetTodos$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.getAllSuccess, actions.getAllError),
+      take(1),
+      map(() => {
+        // Your code here
+      })
+    ),
+    // We disable this option when we're not going to
+    // dispatch any action in our block of code
+    { dispatch: false }
+  );
+
+  // This runs AFTER the afterGetTodosSuccess$ and afterGetTodosError$
+  afterGetTodosSuccessAndError$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.afterGetAll),
+      take(1),
+      map(() => {
+        // Your code here
+      })
+    ),
+    // We disable this option when we're not going to
+    // dispatch any action in our block of code
+    { dispatch: false }
+  );
+}
+```
+
+This is the flux diagram:
+
+![Flux diagram](./img/image-5.png)
