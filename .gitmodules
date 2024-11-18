@@ -22,3 +22,6 @@
 [submodule "Angular/REDUX/Example TODO app"]
 	path = Angular/REDUX/Example TODO app
 	url = https://github.com/jpalomarbl/todo-app-redux
+[submodule "Exercises/Designing a web from a poster/Repo"]
+	path = Exercises/Designing a web from a poster/Repo
+	url = https://github.com/jpalomarbl/web-page-poster.git
