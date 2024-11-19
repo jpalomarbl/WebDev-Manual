@@ -45,6 +45,52 @@ Use modifier class name as selector: `.block--hidden { }` To alter elements base
 <div class="block--mod">...</div>
 ```
 
+## Nesting
+**Source**: [BEM Grandchildren: How To Handle Deeply Nested Elements by Tom Ray.](https://scalablecss.com/bem-nesting-grandchild-elements/)
+
+When nesting, things can get messy very quickly if you follow the *Block__Element__Element__Element* choice.
+
+```html
+<div class=“nav”>
+    <ul class=“nav__menu”>
+        <li class=“nav__menu__item”>
+            <a class=“nav__menu__item__link”>Home</a>
+        </li> 
+    </ul>
+</div>
+```
+
+For example, what happens if I want to wrap the list inside of a container?
+
+```html
+<div class=“nav”>
+    <div class="nav__wrapper"> <!-- Here is my new div-->
+        <!-- Now I need to refactor all the classes below
+        because of the new div -->
+        <ul class=“nav__wrapper__menu”>
+            <li class=“nav__wrapper__menu__item”>
+                <a class=“nav__wrapper____menu__item__link”>Home</a>
+            </li> 
+        </ul>
+    <div>
+</div>
+```
+
+That's why we take the grandchild solution:
+
+```html
+<div class=“nav”>
+    <!-- New div added without the need to refactor -->
+    <div class="nav__wrapper"> 
+        <ul class=“nav__menu”>
+            <li class=“nav__item”>
+                <a class=“nav__link”>Home</a>
+            </li> 
+        </ul>
+    </div>
+</div>
+```
+
 ## Real example
 
 This example is from the attatched Repo, and also uses SCSS, but in a very basic form, so I'll just explain the SCSS tools used in the example quickly for everyone who doesn't know SCSS.
