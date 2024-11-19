@@ -142,3 +142,18 @@ article {
   width: math.div(600px, 960px) * 100%;
 }
 ```
+
+## Using SCSS to personalize Bootstrap classes
+For example, let's change the theme colors that Bootstrap uses when we add classes such as `btn-primary, bg-light`, etc.
+
+To do that, we just need to go to our variables partial and override the theme colors map:
+
+```scss
+$theme-colors: (
+  "primary":    #fff,
+  "secondary":  #fabada,
+  "success":    #121212,
+  "info":       #000,
+  // ...
+);
+```
