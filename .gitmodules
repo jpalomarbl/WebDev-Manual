@@ -25,3 +25,6 @@
 [submodule "Exercises/Designing a web from a poster/Repo"]
 	path = Exercises/Designing a web from a poster/Repo
 	url = https://github.com/jpalomarbl/web-page-poster.git
+[submodule "Angular/Performance/Repo"]
+	path = Angular/Performance/Repo
+	url = https://github.com/jpalomarbl/angular-optimization
