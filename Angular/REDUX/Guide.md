@@ -32,6 +32,19 @@ export const decrement = createAction('[Counter Component] Decrement');
 export const duplication = createAction('[Counter Component] Duplication');
 ```
 
+**NOTE**: DO NOT SET THE SAME TYPE FOR TWO DIFFERENT ACTIONS. THIS WILL CAUSE ERRORS THAT ARE VERY DIFFICULT TO TRACE.
+
+```ts
+// In app/Counter/counter.actions.ts
+import { createAction, props } from "@ngrx/store";
+
+// THIS IS VERY WRONG!!!
+
+export const increment = createAction('[Counter Component] Increment');
+export const decrement = createAction('[Counter Component] Increment');
+export const duplication = createAction('[Counter Component] Increment');
+```
+
 2. Now we need to create the reducer, so we make a `app/Counter/counter.reducer.ts` file. Inside of it, we will have a function that's basically a switch case conditional selector that takes the current state of te **store** and an action as arguments.
 
 ```ts
